@@ -5,7 +5,7 @@ def projectFolderName = "${PROJECT_NAME}"
 // Variables
 def siteRepoName = "fime-static-page"
 def siteRepoUrl = "ssh://jenkins@gerrit:29418/${PROJECT_NAME}/" + siteRepoName
-def fimeBucketName = "fime-site-bucket"
+def fimeBucketName = "fime-chuymarin-bucket"
 
 // Views
 def fimeSitePipeline = buildPipelineView(projectFolderName + "/FIME_S3_Site_Pipeline")
@@ -31,6 +31,9 @@ fimePullCode.with{
   description("Clones Static Page Repo")
   parameters{
     stringParam("S3_BUCKET",fimeBucketName,"AWS S3 Bucket Name")
+    stringParam("AWS_REGION",'',"AWS Region")
+    stringParam("AWS_ACCES_KEY",'',"AWS Access Key")
+    stringParam("AWS_SECRET_KEY",'',"AWS Secret Key")
   }
   environmentVariables {
     env('WORKSPACE_NAME', workspaceFolderName)
@@ -42,12 +45,22 @@ fimePullCode.with{
     sshAgent("adop-jenkins-master")
   }
   label("docker")
-    steps {
-    shell('''
-set +x
-echo "[LOG] Pull Site Repository"
-set -x'''.stripMargin()
-    )
+  triggers {
+   gerrit {
+     events {
+       refUpdated()
+     }
+     project("${PROJECT_NAME}/" + siteRepoName, 'master')
+    }
+  }
+  scm{
+     git{
+       remote{
+         url(siteRepoUrl)
+         credentials("adop-jenkins-master")
+       }
+       branch("*/master")
+     }
   }
   publishers{
     archiveArtifacts("**/*")
@@ -66,7 +79,10 @@ set -x'''.stripMargin()
 fimeCreateBucket.with{
   description("Create AWS S3 Bucket")
   parameters{
-    stringParam("S3_BUCKET","","AWS S3 Bucket Name")
+    stringParam("S3_BUCKET",'',"AWS S3 Bucket Name")
+    stringParam("AWS_REGION",'',"AWS Region")
+    stringParam("AWS_ACCES_KEY",'',"AWS Access Key")
+    stringParam("AWS_SECRET_KEY",'',"AWS Secret Key")
   }
   environmentVariables {
     env('WORKSPACE_NAME', workspaceFolderName)
@@ -80,7 +96,22 @@ fimeCreateBucket.with{
   steps {
     shell('''
 set +x
-echo "[LOG] Create S3 Bucket if not exists"
+
+echo "[LOG] Export AWS Configuration"
+export AWS_ACCESS_KEY_ID=$AWS_ACCES_KEY
+export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_KEY
+export AWS_DEFAULT_REGION=$AWS_REGION
+
+
+echo "[LOG] Create S3 Bucket $S3_BUCKET if not exists"
+S3_BUCKETS=$(aws s3 ls)
+if grep -q $S3_BUCKET <<<$S3_BUCKETS; then
+  echo "[LOG] S3 Bucket $S3_BUCKET already exists"
+else
+  echo "[LOG] Creating S3 Bucket $S3_BUCKET"
+  aws s3 mb s3://$S3_BUCKET
+fi
+
 set -x'''.stripMargin()
     )
   }
@@ -100,7 +131,10 @@ set -x'''.stripMargin()
 fimeDeploySite.with{
   description("Deploy Site to AWS S3")
   parameters{
-    stringParam("S3_BUCKET","","AWS S3 Bucket Name")
+    stringParam("S3_BUCKET",'',"AWS S3 Bucket Name")
+    stringParam("AWS_REGION",'',"AWS Region")
+    stringParam("AWS_ACCES_KEY",'',"AWS Access Key")
+    stringParam("AWS_SECRET_KEY",'',"AWS Secret Key")
   }
   environmentVariables {
     env('WORKSPACE_NAME', workspaceFolderName)
@@ -112,9 +146,28 @@ fimeDeploySite.with{
   }
   label("docker")
   steps {
+    copyArtifacts(projectFolderName + "/FIME_Pull_Code") {
+      buildSelector {
+        latestSuccessful(true)
+      }
+    }
     shell('''
 set +x
+
+echo "[LOG] Export AWS Configuration"
+export AWS_ACCESS_KEY_ID=$AWS_ACCES_KEY
+export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_KEY
+export AWS_DEFAULT_REGION=$AWS_REGION
+
 echo "[LOG] Deploy Site to AWS S3 Bucket"
+aws s3 cp index.html s3://$S3_BUCKET/index.html --acl public-read
+
+echo "[LOG] Create Website from S3 Bucket"
+aws s3 website s3://$S3_BUCKET/ --index-document index.html
+
+echo "[LOG] Check your new site at:"
+echo "http://$S3_BUCKET.s3-website-$AWS_REGION.amazonaws.com"
+
 set -x'''.stripMargin()
     )
   }
