@@ -3,34 +3,34 @@ def workspaceFolderName = "${WORKSPACE_NAME}"
 def projectFolderName = "${PROJECT_NAME}"
 
 // Variables
-def siteRepoName = "fime-static-page"
+def siteRepoName = "doa17-static-page"
 def siteRepoUrl = "ssh://jenkins@gerrit:29418/${PROJECT_NAME}/" + siteRepoName
-def fimeBucketName = "fime-chuymarin-bucket"
+def doa17BucketName = "doa17-name-bucket"
 
 // Views
-def fimeSitePipeline = buildPipelineView(projectFolderName + "/FIME_S3_Site_Pipeline")
+def doa17SitePipeline = buildPipelineView(projectFolderName + "/DOA17_S3_Site_Pipeline")
 
 // Jobs
-def fimePullCode = freeStyleJob(projectFolderName + "/FIME_Pull_Code")
-def fimeCreateBucket = freeStyleJob(projectFolderName + "/FIME_Create_Bucket")
-def fimeDeploySite = freeStyleJob(projectFolderName + "/FIME_Deploy_Site")
+def doa17PullCode = freeStyleJob(projectFolderName + "/DOA17_Pull_Code")
+def doa17CreateBucket = freeStyleJob(projectFolderName + "/DOA17_Create_Bucket")
+def doa17DeploySite = freeStyleJob(projectFolderName + "/DOA17_Deploy_Site")
 
 
-// FIME_S3_Site_Pipeline
-fimeSitePipeline.with{
-    title('FIME S3 Site Pipeline')
+// DOA17_S3_Site_Pipeline
+doa17SitePipeline.with{
+    title('DOA17 S3 Site Pipeline')
     displayedBuilds(5)
-    selectedJob(projectFolderName + "/FIME_Pull_Code")
+    selectedJob(projectFolderName + "/DOA17_Pull_Code")
     showPipelineDefinitionHeader()
     alwaysAllowManualTrigger()
     refreshFrequency(5)
 }
 
-// FIME_Pull_Code
-fimePullCode.with{
+// DOA17_Pull_Code
+doa17PullCode.with{
   description("Clones Static Page Repo")
   parameters{
-    stringParam("S3_BUCKET",fimeBucketName,"AWS S3 Bucket Name")
+    stringParam("S3_BUCKET",doa17BucketName,"AWS S3 Bucket Name")
     stringParam("AWS_REGION",'',"AWS Region")
     stringParam("AWS_ACCES_KEY",'',"AWS Access Key")
     stringParam("AWS_SECRET_KEY",'',"AWS Secret Key")
@@ -65,7 +65,7 @@ fimePullCode.with{
   publishers{
     archiveArtifacts("**/*")
     downstreamParameterized{
-      trigger(projectFolderName + "/FIME_Create_Bucket"){
+      trigger(projectFolderName + "/DOA17_Create_Bucket"){
         condition("UNSTABLE_OR_BETTER")
         parameters{
           currentBuild()
@@ -75,8 +75,8 @@ fimePullCode.with{
   }
 }
 
-// FIME_Create_Bucket
-fimeCreateBucket.with{
+// DOA17_Create_Bucket
+doa17CreateBucket.with{
   description("Create AWS S3 Bucket")
   parameters{
     stringParam("S3_BUCKET",'',"AWS S3 Bucket Name")
@@ -117,7 +117,7 @@ set -x'''.stripMargin()
   }
   publishers{
     downstreamParameterized{
-      trigger(projectFolderName + "/FIME_Deploy_Site"){
+      trigger(projectFolderName + "/DOA17_Deploy_Site"){
         condition("UNSTABLE_OR_BETTER")
         parameters{
           currentBuild()
@@ -127,8 +127,8 @@ set -x'''.stripMargin()
   }
 }
 
-// FIME_Deploy_Site
-fimeDeploySite.with{
+// DOA17_Deploy_Site
+doa17DeploySite.with{
   description("Deploy Site to AWS S3")
   parameters{
     stringParam("S3_BUCKET",'',"AWS S3 Bucket Name")
@@ -146,7 +146,7 @@ fimeDeploySite.with{
   }
   label("docker")
   steps {
-    copyArtifacts(projectFolderName + "/FIME_Pull_Code") {
+    copyArtifacts(projectFolderName + "/DOA17_Pull_Code") {
       buildSelector {
         latestSuccessful(true)
       }
