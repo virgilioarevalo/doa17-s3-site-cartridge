@@ -97,7 +97,7 @@ doa17CreateBucket.with{
 set +x
 
 echo "[LOG] Export AWS Configuration"
-export AWS_ACCESS_KEY_ID=$AWS_ACCES_KEY
+export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY
 export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_KEY
 export AWS_DEFAULT_REGION=$AWS_REGION
 
@@ -154,7 +154,7 @@ doa17DeploySite.with{
 set +x
 
 echo "[LOG] Export AWS Configuration"
-export AWS_ACCESS_KEY_ID=$AWS_ACCES_KEY
+export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY
 export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_KEY
 export AWS_DEFAULT_REGION=$AWS_REGION
 
