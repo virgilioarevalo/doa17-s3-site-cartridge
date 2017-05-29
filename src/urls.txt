@@ -1,1 +1,1 @@
-https://github.com/chuymarin/fime-static-page.git
+https://github.com/chuymarin/doa17-static-page.git

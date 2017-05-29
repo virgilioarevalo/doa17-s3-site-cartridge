@@ -85,7 +85,7 @@ doa17CreateBucket.with{
     stringParam("S3_BUCKET",'',"AWS S3 Bucket Name")
     stringParam("AWS_REGION",'',"AWS Region")
     stringParam("AWS_ACCESS_KEY",'',"AWS Access Key")
-    nonStoredPasswordParam("AWS_SECRET_KEY",'',"AWS Secret Key")
+    nonStoredPasswordParam("AWS_SECRET_KEY","AWS Secret Key")
   }
   wrappers {
     preBuildCleanup()
@@ -137,7 +137,7 @@ doa17DeploySite.with{
     stringParam("S3_BUCKET",'',"AWS S3 Bucket Name")
     stringParam("AWS_REGION",'',"AWS Region")
     stringParam("AWS_ACCESS_KEY",'',"AWS Access Key")
-    nonStoredPasswordParam("AWS_SECRET_KEY",'',"AWS Secret Key")
+    nonStoredPasswordParam("AWS_SECRET_KEY","AWS Secret Key")
   }
   wrappers {
     preBuildCleanup()
