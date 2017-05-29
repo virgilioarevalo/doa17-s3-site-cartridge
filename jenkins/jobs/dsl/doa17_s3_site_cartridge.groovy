@@ -145,7 +145,7 @@ doa17DeploySite.with{
   }
   label("docker")
   steps {
-    copyArtifacts(projectFolderName + "/FIME_Pull_Code") {
+    copyArtifacts(projectFolderName + "/DOA17_Pull_Code") {
       buildSelector {
         latestSuccessful(true)
       }
