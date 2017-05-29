@@ -63,6 +63,7 @@ doa17PullCode.with{
      }
   }
   publishers{
+    archiveArtifacts("**/*")
     downstreamParameterized{
       trigger(projectFolderName + "/DOA17_Create_Bucket"){
         condition("UNSTABLE_OR_BETTER")
