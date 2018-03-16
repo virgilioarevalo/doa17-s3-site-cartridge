@@ -5,7 +5,7 @@ def projectFolderName = "${PROJECT_NAME}"
 // Variables
 def siteRepoName = "doa17-static-page"
 def siteRepoUrl = "ssh://jenkins@gerrit:29418/${PROJECT_NAME}/" + siteRepoName
-def doa17BucketName = "doa17-{your-github-user}-bucket"
+def doa17BucketName = "doa17-virgilioarevalo-bucket"
 
 // Views
 def doa17SitePipeline = buildPipelineView(projectFolderName + "/DOA17_S3_Site_Pipeline")
