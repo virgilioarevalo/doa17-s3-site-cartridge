@@ -5,7 +5,7 @@ def projectFolderName = "${PROJECT_NAME}"
 // Variables
 def siteRepoName = "doa17-static-page"
 def siteRepoUrl = "ssh://jenkins@gerrit:29418/${PROJECT_NAME}/" + siteRepoName
-def doa17BucketName = "doa17-chuymarin-bucket"
+def doa17BucketName = "doa17-{your-github-user}-bucket"
 
 // Views
 def doa17SitePipeline = buildPipelineView(projectFolderName + "/DOA17_S3_Site_Pipeline")
@@ -36,8 +36,6 @@ doa17PullCode.with{
   parameters{
     stringParam("S3_BUCKET",doa17BucketName,"AWS S3 Bucket Name")
     stringParam("AWS_REGION",'',"AWS Region")
-    stringParam("AWS_ACCESS_KEY",'',"AWS Access Key")
-    nonStoredPasswordParam("AWS_SECRET_KEY","AWS Secret Key")
   }
   wrappers {
     preBuildCleanup()
@@ -85,8 +83,6 @@ doa17CreateBucket.with{
   parameters{
     stringParam("S3_BUCKET",'',"AWS S3 Bucket Name")
     stringParam("AWS_REGION",'',"AWS Region")
-    stringParam("AWS_ACCESS_KEY",'',"AWS Access Key")
-    nonStoredPasswordParam("AWS_SECRET_KEY","AWS Secret Key")
   }
   wrappers {
     preBuildCleanup()
@@ -98,8 +94,6 @@ doa17CreateBucket.with{
 set +x
 
 echo "[LOG] Export AWS Configuration"
-export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY
-export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_KEY
 export AWS_DEFAULT_REGION=$AWS_REGION
 
 
@@ -137,8 +131,6 @@ doa17DeploySite.with{
   parameters{
     stringParam("S3_BUCKET",'',"AWS S3 Bucket Name")
     stringParam("AWS_REGION",'',"AWS Region")
-    stringParam("AWS_ACCESS_KEY",'',"AWS Access Key")
-    nonStoredPasswordParam("AWS_SECRET_KEY","AWS Secret Key")
   }
   wrappers {
     preBuildCleanup()
@@ -155,8 +147,6 @@ doa17DeploySite.with{
 set +x
 
 echo "[LOG] Export AWS Configuration"
-export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY
-export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_KEY
 export AWS_DEFAULT_REGION=$AWS_REGION
 
 echo "[LOG] Deploy Site to AWS S3 Bucket"

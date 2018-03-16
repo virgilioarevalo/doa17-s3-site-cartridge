@@ -1,1 +1,1 @@
-https://github.com/chuymarin/doa17-static-page.git
+https://github.com/{your_github_user}/doa17-static-page.git
